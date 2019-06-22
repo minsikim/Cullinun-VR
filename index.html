@@ -37,6 +37,7 @@
         justify-content: center;
 
         overflow: hidden;
+        z-index: 100;
       }
       .tabs{
         height: 60px;
@@ -99,6 +100,14 @@
         background-color: red;
         transform: scale(1.5);
       }
+      #warning{
+        color: red;
+        font-weight: 900;
+        position: fixed;
+        top: 10px;
+        width: 100%;
+        text-align: center;
+      }
     </style>
 </head>
 <body>
@@ -114,17 +123,18 @@
       <img id="planImage" src="img/25A-1-plan.jpg" alt="">
     </div>
     <div class="points">
-      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
-      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
-      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
-      <div class="point active" data="00A-0" onclick="handlePointClick(this)"></div>
-      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
-      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
-      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
-      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
-      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
+      <div class="point" data="00A-0-0" onclick="handlePointClick(this)"></div>
+      <div class="point" data="00A-0-0" onclick="handlePointClick(this)"></div>
+      <div class="point" data="00A-0-0" onclick="handlePointClick(this)"></div>
+      <div class="point active" data="00A-0-0" onclick="handlePointClick(this)"></div>
+      <div class="point" data="00A-0-0" onclick="handlePointClick(this)"></div>
+      <div class="point" data="00A-0-0" onclick="handlePointClick(this)"></div>
+      <div class="point" data="00A-0-0" onclick="handlePointClick(this)"></div>
+      <div class="point" data="00A-0-0" onclick="handlePointClick(this)"></div>
+      <div class="point" data="00A-0-0" onclick="handlePointClick(this)"></div>
     </div>
   </div>
+  <div id="warning">작업중 프로젝트입니다. 19.06.22.</div>
 <script>
   /* 
     currentScene : string
