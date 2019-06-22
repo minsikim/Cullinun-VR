@@ -1,78 +1,206 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML>
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-  <title>360-image-viewer</title>
-  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
-  <style>
-  body {
-    margin: 0;
-    font-family: 'Source Sans Pro', Helvetica, sans-serif;
-    overflow: hidden;
-  }
-  * {
-    -webkit-touch-callout:none;
-    -webkit-text-size-adjust:none;
-    -webkit-tap-highlight-color:rgba(0,0,0,0);
-    -webkit-user-select:none;
-  }
-  .info {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    margin: 20px;
-    pointer-events: none;
-  }
-  .hr {
-    width: 20px;
-    height: 1px;
-    margin: 0;
-    padding: 0;
-    margin-bottom: 10px;
-    display: block;
-    background: white;
-    vertical-align: middle;
-  }
-  p {
-    display: block;
-    margin: 0;
-    padding: 0;
-    vertical-align: middle;
-    color: white;
-    font-size: 10px;
-  }
-  canvas, .grab {
-    cursor: -webkit-grab;
-    cursor: -moz-grab;
-  }
-  canvas:active, .grabbing {
-    cursor: -webkit-grabbing;
-    cursor: -moz-grabbing; 
-  }
-  #drop-region {
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    width: calc(100% - 10px);
-    height: calc(100% - 10px);
-    pointer-events: none;
-    border: 2px dashed white;
-    box-sizing: border-box;
-    border-radius: 10px;
-    padding: 10px;
-    mix-blend-mode: overlay;
-    box-shadow: 0px 0px 20px 10px rgba(0, 0, 0, 0.5);
-  }
-  </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>컬리넌 하우스 VR 뷰어</title>
+    <link rel="stylesheet" href="https://cdn.pannellum.org/2.4/pannellum.css"/>
+    <script type="text/javascript" src="https://cdn.pannellum.org/2.4/pannellum.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"></script>
+    <style>
+      body{
+        margin: 0px;
+        min-width: 100vw;
+        min-height: 100vh;
+      }
+      #panorama {
+          width: 100%;
+          min-height: 500px;
+          height: 100vh;
+      }
+      #plan{
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        width: 200px;
+        height: 260px;
+        background-color: white;
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid rgba(0,0,0,.5);
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        overflow: hidden;
+      }
+      .tabs{
+        height: 60px;
+        border-radius: 5px;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+      .tab{
+        height: 28px;
+        margin-right: 3px;
+        background-color: #fff9db;
+        padding-top: 3px;
+        box-sizing: border-box;
+        font-size: 14px;
+        text-align: center;
+        border: 1px solid rgba(0,0,0,.3);
+        
+        cursor: pointer;
+      }
+      .tab:nth-child(odd){
+        border-radius: 3px 3px 0px 0px;
+      }
+      .tab:nth-child(even){
+        border-radius: 0px 0px 3px 3px;
+      }
+      .tab.active{
+        background-color: #ffd43b;
+        border-color: rgba(0,0,0,.7);
+      }
+      .tab:hover{
+        background-color: #fab005;
+      }
+      .planImage{
+        width: 200px;
+        height: 200px;
+      }
+      .points{
+        position: relative;
+      }
+      .point{
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 10px;
+        background-color: gray;
+        border: 2px solid white;
+        box-sizing: border-box;
+        box-shadow: 0px 0px 3px 3px rgba(0,0,0,.3);
+        transition: transform .3s;
+        cursor: pointer;
+      }
+      .point.active{
+        background-color: red;
+        transform: scale(1.2);
+      }
+      .point:hover{
+        background-color: red;
+        transform: scale(1.5);
+      }
+    </style>
 </head>
 <body>
-  <canvas id="canvas"></canvas>
-  <div class="info">
-    <div class="hr"></div>
-    <p>Drop an equirectangular JPG or PNG here to view it in 360º</p>
+  <div id="panorama"></div>
+  <div id="plan">
+    <div class="tabs">
+      <div class="tab" data="25A-2" onclick="handleTabClick(this)">25A 2층</div>
+      <div class="tab active" data="25A-1" onclick="handleTabClick(this)">25A 1층</div>
+      <div class="tab" data="33B-2" onclick="handleTabClick(this)">33B 2층</div>
+      <div class="tab" data="33B-1" onclick="handleTabClick(this)">33B 1층</div>
+    </div>
+    <div class="planImage">
+      <img id="planImage" src="img/25A-1-plan.jpg" alt="">
+    </div>
+    <div class="points">
+      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
+      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
+      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
+      <div class="point active" data="00A-0" onclick="handlePointClick(this)"></div>
+      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
+      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
+      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
+      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
+      <div class="point" data="00A-0" onclick="handlePointClick(this)"></div>
+    </div>
   </div>
-  <div id="drop-region" style="display: none;"></div>
-  <script src="test.js"></script>
+<script>
+  /* 
+    currentScene : string
+    [평수][타입]-[사진번호]
+    사진번호는 거실-주방-안방-방-화장실 순으로 하고 같은 명칭은 면적크기별로 함
+    jpg명을 currentScene명과 같이 유지
+  */
+  var currentPlan = "25A-1";
+  var currentScene = "25A-1";
+
+  /* 
+    loadCurrentScene : function
+    하단 탭의 onclick function과 연동함
+    항상 currentScene을 로드함
+  */
+  function loadCurrentScene(sceneID){
+    console.log("loadCurrentScene",sceneID);
+    if(!sceneID){
+      pannellum.viewer('panorama', {
+        "type": "equirectangular",
+        "panorama": "./img/"+currentScene+".jpg",
+        "autoLoad": true,
+        "autoRotate": 10,
+        "pitch": 2.3,
+        "yaw": -135.4,
+        "hfov": 120
+      });
+    }else{
+      pannellum.viewer('panorama', {
+        "type": "equirectangular",
+        "panorama": "./img/"+sceneID+".jpg",
+        "autoLoad": true,
+        "autoRotate": 10,
+        "pitch": 2.3,
+        "yaw": -135.4,
+        "hfov": 120
+      });
+    }
+  }
+  function handleTabClick(e){
+    var tempSceneId = $(e).attr('data');
+    $('.tab').removeClass('active');
+    $(e).addClass('active');
+    changePlan(tempSceneId);
+    loadCurrentScene(tempSceneId);
+    console.log(tempSceneId);
+    
+  }
+  function handlePointClick(e){
+    $('.point').removeClass('active');
+    $(e).addClass('active');
+    console.log($(e).attr('data'));
+    loadCurrentScene();
+  }
+
+  function changePlan(data){
+    if(typeof data === "string"){
+      $("#planImage").attr("src", "img/"+data+"-plan.jpg");
+      randomPoints()
+      currentPlan = data;
+    }else return;
+  }
+  /* 
+    randomPoints : function
+    개발중 임시로 짜놓은 포인트 랜덤 분배
+  */
+  function randomPoints(){
+    $(".point").each(function(){
+      $(this).css('top', Math.random()*(-200)+"px");
+      $(this).css('left', (Math.random()*80+10)+"%");
+    });
+  }
+
+  loadCurrentScene();
+  randomPoints();
+</script>
+
 </body>
 </html>
