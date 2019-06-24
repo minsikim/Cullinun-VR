@@ -6,6 +6,7 @@
     <title>컬리넌 하우스 VR 뷰어</title>
     <link rel="stylesheet" href="https://cdn.pannellum.org/2.4/pannellum.css"/>
     <script type="text/javascript" src="https://cdn.pannellum.org/2.4/pannellum.js"></script>
+    <script src="data.js"></script>
     <script
       src="https://code.jquery.com/jquery-3.4.1.min.js"
       integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
@@ -152,28 +153,22 @@
   */
   function loadCurrentScene(sceneID){
     console.log("loadCurrentScene",sceneID);
-    if(!sceneID){
-      pannellum.viewer('panorama', {
-        "type": "equirectangular",
-        "panorama": "./img/"+currentScene+".jpg",
-        "autoLoad": true,
-        "autoRotate": 10,
-        "pitch": 2.3,
-        "yaw": -135.4,
-        "hfov": 120
-      });
-    }else{
-      pannellum.viewer('panorama', {
-        "type": "equirectangular",
-        "panorama": "./img/"+sceneID+".jpg",
-        "autoLoad": true,
-        "autoRotate": 10,
-        "pitch": 2.3,
-        "yaw": -135.4,
-        "hfov": 120
-      });
+    if(sceneID){
+      currentScene = sceneID;
     }
+    currentScene
+    pannellum.viewer('panorama', {
+      "type": "equirectangular",
+      "panorama": "./img/"+currentScene+".jpg",
+      "autoLoad": true,
+      "autoRotate": 10,
+      "pitch": 2.3,
+      "yaw": -135.4,
+      "hfov": 120
+    });
   }
+
+
   function handleTabClick(e){
     var tempSceneId = $(e).attr('data');
     $('.tab').removeClass('active');
@@ -183,13 +178,24 @@
     console.log(tempSceneId);
     
   }
+
+  /* 
+    handlePointClick : function
+    point에 data가 부여되어 있고
+    그 data와 같은 파일명칭을 가진 jpg를 VR 화면에 로드함
+  */
   function handlePointClick(e){
     $('.point').removeClass('active');
     $(e).addClass('active');
     console.log($(e).attr('data'));
     loadCurrentScene();
   }
-
+  /* 
+    changePlan : function
+    .tab 의 data를 받아서 이미지를 바꿔줌
+    각 평면도의 jpg 이미지는 200x200px
+    각 평면도의 jpg 이미지의 파일명은 [data].jpg로 한다
+  */
   function changePlan(data){
     if(typeof data === "string"){
       $("#planImage").attr("src", "img/"+data+"-plan.jpg");
@@ -206,6 +212,10 @@
       $(this).css('top', Math.random()*(-200)+"px");
       $(this).css('left', (Math.random()*80+10)+"%");
     });
+  }
+
+  function handleHotspotClick(args){
+    loadCurrentScene(args.data);
   }
 
   loadCurrentScene();
